@@ -1,0 +1,82 @@
+package Analizadores;
+import Errores.Errores;
+import java_cup.runtime.Symbol; 
+import java.util.ArrayList;
+
+%% 
+%class Lexico
+%public 
+%line 
+%char 
+%cup 
+%unicode
+
+%init{ 
+    yyline = 1; 
+    yychar = 1; 
+%init} 
+
+BLANCOS=[ \r\t]+
+D=[0-9]+
+DECIMAL = [0-9]+(\.[0-9]+)?
+GUION = "-"
+MQUE = ">"
+
+
+COMENTUNILINEA      =   ("//".*\r\n)|("//".*\n)|("//".*\r)
+
+COMENTMULTILINEA     =  \<\!([^!\>]|[^!]\>|\![^\>])*\!\>
+CADENACOMILLASDOBLES = [\"]
+COMILLASIMPLE = [\']
+TODO = [^.*]
+ESPACIO = [\s+]
+INVERBARRA = [\\]
+ASCII =  [!-$&<-=@/]
+ALFAMIN= [a-z]
+ALFAMAY= [A-Z]
+ALFA = [A-Za-z]
+RAN=([a-zA-Z_])[a-zA-Z0-9_]* 
+
+
+%%
+
+{COMENTUNILINEA} {} 
+{COMENTMULTILINEA} {}  
+
+{COMILLASIMPLE}                 {return new Symbol(sym.COMILLASIMPLE,yyline,yychar, yytext());}
+{CADENACOMILLASDOBLES}          {return new Symbol(sym.COMILLA,yyline,yychar, yytext());}
+
+
+"CONJ"                          {return new Symbol(sym.CONJUNTO,yyline,yychar, yytext());}
+
+"~"                             {return new Symbol(sym.VIR,yyline,yychar, yytext());}
+"{"                             {return new Symbol(sym.LLAVEI,yyline,yychar, yytext());}
+"}"                             {return new Symbol(sym.LLAVED,yyline,yychar, yytext());}
+":"                             {return new Symbol(sym.DPUNTOS,yyline,yychar, yytext());}
+"."                             {return new Symbol(sym.PUNTO,yyline,yychar, yytext());}
+","                             {return new Symbol(sym.COMA,yyline,yychar, yytext());}
+"?"                             {return new Symbol(sym.INTERR,yyline,yychar, yytext());}
+";"                             {return new Symbol(sym.PTCOMA,yyline,yychar, yytext());}
+"|"                             {return new Symbol(sym.BARRA,yyline,yychar, yytext());} 
+"+"                             {return new Symbol(sym.MAS,yyline,yychar, yytext());} 
+"*"                             {return new Symbol(sym.POR,yyline,yychar, yytext());} 
+"%%"                            {return new Symbol(sym.PORC,yyline,yychar, yytext());} 
+
+\n {yychar=1;}
+
+{BLANCOS} {} 
+{D}                             {return new Symbol(sym.ENTERO,yyline,yychar, yytext());} 
+{GUION}                          {return new Symbol(sym.GUION,yyline,yychar, yytext());} 
+{MQUE}                        {return new Symbol(sym.MQUE,yyline,yychar, yytext());} 
+{ALFAMIN}                       {return new Symbol(sym.ALFAMIN,yyline, yychar, yytext());}
+{ALFAMAY}                       {return new Symbol(sym.ALFAMAY,yyline, yychar, yytext());}
+{ASCII}                         {return new Symbol(sym.ASCII,yyline,yychar, yytext());}
+{INVERBARRA}                    {return new Symbol(sym.INVERBARRA,yyline, yychar, yytext());}
+{RAN}                           {return new Symbol(sym.RAN,yyline, yychar, yytext());}
+{ESPACIO}                       {return new Symbol(sym.ESPACIO,yyline,yychar, yytext());}
+{TODO}                          {return new Symbol(sym.TODO,yyline,yychar, yytext());}
+
+
+. {
+            new Errores("Lexico", "Error lexico detectado. Se detecto:" +yytext(),yyline+"",yychar+"");
+}
